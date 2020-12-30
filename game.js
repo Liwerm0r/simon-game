@@ -27,7 +27,9 @@ function makeButtonsInteractive() {
 }
 
 function checkSequence(clickedButton) {
-
+  console.log("clicked-button: " + $(clickedButton).text());
+  console.log("global-key-press: " + globalKeyPress);
+  console.log("current-button-sequence: " + $(buttonSequence).text());
   if ( buttonSequence[globalKeyPress] === clickedButton ) {
     globalKeyPress++;
     if ( globalKeyPress === buttonSequence.length) {
@@ -47,10 +49,10 @@ function appendButtonAndAnimateAfterDelay() {
   buttonSequence.push(randomButton);
   // show and let hear to the user which element was picked
   setTimeout(function () {
-    animateButton(randomButton);
+    $(randomButton).fadeOut(300).fadeIn(300);
     makeSound(randomButton);
   }, 800);
-  // set level of the gameOver
+  // set title - display current level of the game
   $(".title").text(`level ${globalKeyPress + 1}`);
 }
 
@@ -63,6 +65,10 @@ function gameOver() {
   setTimeout(function () {
     $("body").removeClass("game-over");
   }, 200);
+  // disable buttons interaction
+  $(".btn").off("click");
+  // enable keydown listener for game restart
+  initialize();
 }
 
 // generate random button
@@ -75,18 +81,21 @@ function generateRandomButton() {
   return randomButton;
 }
 
+function initialize() {
+  $(document).keydown(() => {
+    // make buttons fade out and fade in after appending to the list
+    globalKeyPress = 0;
+    buttonSequence = [];
+    makeButtonsInteractive();
+    appendButtonAndAnimateAfterDelay();
+    // after initilize detach keydown listener
+    $(document).off("keydown");
+  });
+}
 ////////////////////////////////////
 ///////////   SCRIPT   /////////////
 ////////////////////////////////////
 
-// initialize game after any button press
-$(document).keydown(() => {
-  // make buttons fade out and fade in after appending to the list
-  globalKeyPress = 0;
-  buttonSequence = [];
-  makeButtonsInteractive();
-  appendButtonAndAnimateAfterDelay();
-});
-
+initialize();
 var globalKeyPress = 0;
 var buttonSequence = [];

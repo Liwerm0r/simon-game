@@ -31,12 +31,11 @@ function checkSequence(clickedButton) {
   if ( buttonSequence[globalKeyPress] === clickedButton ) {
     globalKeyPress++;
     if ( globalKeyPress === buttonSequence.length) {
-      console.log("append new button");
       appendButtonAndAnimateAfterDelay();
       globalKeyPress = 0;
     }
   } else {
-    // wipe globalKeyPress history and buttonSequence
+    // if user choose wrong button then wipe globalKeyPress history and buttonSequence
     globalKeyPress = 0;
     buttonSequence = [];
     gameOver();
@@ -50,14 +49,20 @@ function appendButtonAndAnimateAfterDelay() {
   setTimeout(function () {
     animateButton(randomButton);
     makeSound(randomButton);
-  }, 1000);
+  }, 800);
+  // set level of the gameOver
+  $(".title").text(`level ${globalKeyPress + 1}`);
 }
 
 // game over
 function gameOver() {
   audio = new Audio("sounds/wrong.mp3");
   audio.play();
-  $("body").css("background-color", "white");
+  $("body").addClass("game-over");
+  $(".title").text("Game Over, Press Any Key to Restart");
+  setTimeout(function () {
+    $("body").removeClass("game-over");
+  }, 200);
 }
 
 // generate random button
@@ -76,11 +81,12 @@ function generateRandomButton() {
 
 // initialize game after any button press
 $(document).keydown(() => {
-  $(".title").text("Play");
+  // make buttons fade out and fade in after appending to the list
+  globalKeyPress = 0;
+  buttonSequence = [];
   makeButtonsInteractive();
   appendButtonAndAnimateAfterDelay();
 });
 
 var globalKeyPress = 0;
 var buttonSequence = [];
-var checkedSequence = false;
